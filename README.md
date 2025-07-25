@@ -39,5 +39,5 @@
 
 ### 1. Clone & Import Workflow
 ```bash
-git clone https://github.com/<your-username>/dubai-ai-realtor-bot.git
+git clone https://github.com/MoreVijayP/dubai-ai-realtor-bot.git
 cd dubai-ai-realtor-bot
