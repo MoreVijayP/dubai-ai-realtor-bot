@@ -1,0 +1,422 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 1,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "q": "is:unread subject:\"Test-Dubai-property\""
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -272,
+        64
+      ],
+      "id": "5d4c4c7c-bd9d-4a07-ba42-4cb281e56b87",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "hnULlznjy9irwBOr",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an assistant for a real estate agency.\n\nExtract the following fields from the user message below and return a clean JSON response with these keys only:  \n- `name` \n- `budget`  \n- `location`  \n- `property_type` (must be either \"villa\" or \"apartment\")  \n- `intent` (must be either \"buy\" or \"rent\")  \n- `contact` (mobile number, if mentioned)  \n- `email`  \n- `furnished` (true/false if mentioned)  \n- `amenities` (list important ones if available, like pool, gym, parking)\n\nMessage: {{ $json.text }}\n\nOnly return JSON like this:\n```json\n{\n  \"budget\": \"AED 120,000\",\n  \"location\": \"Downtown Dubai\",\n  \"property_type\": \"apartment\",\n  \"intent\": \"rent\",\n  \"contact\": \"+971501234567\",\n  \"email\": \"example@email.com\",\n  \"furnished\": true,\n  \"amenities\": [\"pool\", \"gym\", \"parking\"]\n}\n",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2c917ff3-2348-4a4c-abeb-1b6d9ce03b11",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        208
+      ],
+      "id": "67f3331e-efd5-4bc5-8eb4-48be72087b0c",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "s7tAd2pMmhzCuuJp",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1vb2st6YVopcoBVVXktKyHsbUhelMLeS8Bg4-mf2ta-U",
+          "mode": "list",
+          "cachedResultName": "Dubai Real Estate Lead Manager",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vb2st6YVopcoBVVXktKyHsbUhelMLeS8Bg4-mf2ta-U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vb2st6YVopcoBVVXktKyHsbUhelMLeS8Bg4-mf2ta-U/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Contact": "={{ $json.contact }}",
+            "Budget": "={{ $json.budget }}",
+            "Location": "={{ $json.location }}",
+            "Property Type": "={{ $json.property_type }}",
+            "Intent": "={{ $json.intent }}",
+            "Email": "={{ $json.email }}",
+            "Furnished": "={{ $json.furnished }}",
+            "amenities": "={{ $('Code').item.json.amenities }}",
+            "Date": "={{ $now.toLocaleString('en-US', { timeZone: 'Asia/Dubai' }) }}",
+            "Name": "={{ $json.name }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Contact",
+              "displayName": "Contact",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Property Type",
+              "displayName": "Property Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Intent",
+              "displayName": "Intent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Furnished",
+              "displayName": "Furnished",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "amenities",
+              "displayName": "amenities",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        848,
+        0
+      ],
+      "id": "5df85458-11f1-4592-bd22-b5987a716581",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SKgUpJItQ0RTnEPk",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Remove all escape characters and artifacts\nconst sanitizeJsonString = (dirtyJson) => {\n  return dirtyJson\n    .replace(/\\\\n/g, '')       // Remove \\n\n    .replace(/\\\\\"/g, '\"')      // Remove \\\"\n    .replace(/^json/, '')      // Remove leading 'json'\n    .replace(/^\\`\\`\\`json|\\`\\`\\`$/g, '') // Remove ```json wrappers\n    .trim();\n};\n\n// 2. Safe JSON parser with fallback\nconst safeJsonParse = (jsonString) => {\n  try {\n    return JSON.parse(jsonString);\n  } catch (e) {\n    // Fallback: Extract first JSON-like substring\n    const jsonMatch = jsonString.match(/\\{.*\\}/s);\n    return jsonMatch ? JSON.parse(jsonMatch[0]) : { error: \"Invalid JSON\" };\n  }\n};\n\n// --- MAIN EXECUTION ---\nconst rawInput = $input.first().json.text; // Or your raw JSON string\nconst cleanString = sanitizeJsonString(rawInput);\nreturn safeJsonParse(cleanString);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        0
+      ],
+      "id": "8c3f6a0c-44c3-4825-a1ee-4b36ba754aca",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "651f2501-4a8c-49c5-9977-d47da6002fef",
+              "leftValue": "={{ $json.budget }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "92d8040c-57fc-495b-99b9-8d6577552712",
+              "leftValue": "={{ $json.location }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        0
+      ],
+      "id": "ca97add5-dca6-42ee-a4f2-632bb791a403",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1056,
+        0
+      ],
+      "id": "b4b183bd-16ea-48d1-b711-3a6495b24090",
+      "name": "Mark a message as read",
+      "webhookId": "3be2cb91-99f1-4630-b309-b67d62ad8ba9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "hnULlznjy9irwBOr",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let score = 0;\nconst data = $json;\nif (data.budget && data.location) score += 20;\nif ([\"villa\",\"apartment\"].includes(data.property_type)) score += 10;\nif (data.intent===\"buy\") score +=15;\nif (data.contact) score += 10;\nif (data.email) score += 10;\nif (data.furnished) score += 5;\nif (data.amenities && data.amenities.length) score+=5;\nif (!data.budget) score -=10;\nif (!data.contact) score -=5;\nif (!data.email) score -=5;\nreturn [{json:{...data, score, priority: score>=50?\"Hot\": score>=30?\"Warm\":\"Cold\"}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        -128
+      ],
+      "id": "fb138ae6-c797-4d66-9b16-fcc9b3048123",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Gmail Trigger').item.json.messageId }} ",
+        "message": "=<p>Hi {{ $json.name }},</p>\n\n<p>Thank you for reaching out to us regarding your interest in <strong>{{ $json.intent }}ing</strong> a <strong>{{ $json.property_type }}</strong> in <strong>{{ $json.location }}</strong>. Here's a quick summary of your preferences:</p>\n\n<ul>\n  <li>🏠 <strong>Property Type:</strong> {{ $json.property_type }}</li>\n  <li>📍 <strong>Location:</strong> {{ $json.location }}</li>\n  <li>💰 <strong>Budget:</strong> {{ $json.budget }}</li>\n  <li>🧾 <strong>Intent:</strong> {{ $json.intent }}</li>\n  <li>🛋️ <strong>Furnished:</strong> {{ $json.furnished ? \"Yes\" : \"No\" }}</li>\n  <li>🏋️ <strong>Amenities:</strong> {{ $json.amenities.join(\", \") }}</li>\n  <li>📞 <strong>Contact:</strong> {{ $json.contact }}</li>\n  <li>📧 <strong>Email:</strong> {{ $json.email }}</li>\n</ul>\n\n<p>We’ve received your request and one of our team members will get back to you within the next 24 hours with available listings that match your preferences.</p>\n\n<p>If you have any updates or additional details you'd like to share, feel free to reply to this email.</p>\n\n<p>Warm regards,<br/>\n<strong>[Vijay] Real Estate Bot</strong></p>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        832,
+        176
+      ],
+      "id": "b6690c61-2d11-4413-bddc-4306589c1ad4",
+      "name": "Reply to a message",
+      "webhookId": "9eb1f53a-5225-483f-ac03-a103a94f95e0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "hnULlznjy9irwBOr",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Mark a message as read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "OWo9I0ejwZzUtJuI"
+  },
+  "versionId": "e003e4fe-474b-4147-8845-36cc6e32d8e3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8e9f0a38732597e204f5ee89769041e1f01f4a168c46ba0fe6bd996fd6655f8d"
+  },
+  "id": "5rCxHRLpmQgOmdkJ",
+  "tags": []
+}
