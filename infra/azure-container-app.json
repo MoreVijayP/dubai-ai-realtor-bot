@@ -1,0 +1,49 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2024-03-01/Microsoft.App/containerApps.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": { "value": "uaenorth" },
+    "environmentName": { "value": "n8n-env" },
+    "containerAppName": { "value": "n8n-vij-app" },
+    "containerImage": { "value": "n8nio/n8n:latest" },
+    "targetPort": { "value": 5678 },
+    "cpu": { "value": "0.5" },
+    "memory": { "value": "1Gi" },
+    "secrets": [
+      { "name": "N8N_BASIC_AUTH_ACTIVE", "value": "true" },
+      { "name": "N8N_BASIC_AUTH_USER", "value": "admin" },
+      { "name": "N8N_BASIC_AUTH_PASSWORD", "value": "*****" }
+    ]
+  },
+  "resources": [
+    {
+      "type": "Microsoft.App/containerApps",
+      "apiVersion": "2024-03-01",
+      "name": "[parameters('containerAppName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "environmentId": "[resourceId('Microsoft.App/managedEnvironments', parameters('environmentName'))]",
+        "configuration": {
+          "ingress": {
+            "external": true,
+            "targetPort": "[parameters('targetPort')]",
+            "transport": "Auto",
+            "allowInsecure": false
+          },
+          "secrets": "[parameters('secrets')]"
+        },
+        "template": {
+          "containers": [
+            {
+              "name": "n8n",
+              "image": "[parameters('containerImage')]",
+              "resources": { "cpu": "[parameters('cpu')]", "memory": "[parameters('memory')]" },
+              "env": "[parameters('secrets')]"
+            }
+          ],
+          "scale": { "minReplicas": 1, "maxReplicas": 1 }
+        }
+      }
+    }
+  ]
+}
