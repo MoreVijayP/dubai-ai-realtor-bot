@@ -36,6 +36,11 @@
 
 
 ## ⚙️ Quick Start
+### 🔬 Demo Trigger
+Send an email **to your Gmail** with:  
+**Subject**: `Test-Dubai-property`  
+**Body**: any text (e.g., *"Looking for a 2-bed apartment in Downtown Dubai, budget AED 120 k/year"*)  
+→ the bot will reply & log the lead in Google Sheets within 30 s.
 
 ### 1. Clone & Import Workflow
 ```bash
